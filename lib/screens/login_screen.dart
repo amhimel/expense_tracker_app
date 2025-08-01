@@ -3,7 +3,7 @@ import 'package:expense_tracker/screens/sign_up_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-// import 'sign_up_screen.dart'; // Make sure to create this file as shown earlier
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FlutterSecureStorage secureStorage = FlutterSecureStorage();
 
   String? _emailError;
   String? _passwordError;
@@ -51,13 +52,17 @@ class _LoginScreenState extends State<LoginScreen> {
         email: email,
         password: password,
       );
+      //
+      final uid = userCredential.user?.uid;
 
       final user = userCredential.user;
 
-      if (user != null && user.emailVerified) {
+      if (user != null && user.emailVerified && uid != null) {
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text('Login successful')));
+
+        await secureStorage.write(key: 'user_id', value: uid);
 
         Navigator.pushReplacement(
           context,

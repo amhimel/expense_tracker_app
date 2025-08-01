@@ -1,3 +1,4 @@
+import 'package:expense_tracker/screens/auth_check_screen.dart';
 import 'package:expense_tracker/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -36,6 +37,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       //this is our dark mode theme
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
@@ -76,14 +78,10 @@ class _AppState extends State<App> {
         ),
       ),
       themeMode: ThemeMode.system,
-      // initialRoute: '/',
-      // routes: {
-      //   '/': (context) => PhoneAuthScreen(),
-      //   '/otp_verification': (context) => OtpVerificationScreen(),
-      // },
+   
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: LoginScreen()
+        body: AuthCheckScreen()
       ),
 
 
