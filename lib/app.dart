@@ -1,9 +1,7 @@
-import 'package:expense_tracker/screens/home.dart';
-import 'package:expense_tracker/screens/splash_screen.dart';
+import 'package:expense_tracker/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:lottie/lottie.dart';
 
 var kColorScheme = ColorScheme.fromSeed(
   seedColor: Color.fromARGB(255, 96, 59, 181),
@@ -78,9 +76,14 @@ class _AppState extends State<App> {
         ),
       ),
       themeMode: ThemeMode.system,
+      // initialRoute: '/',
+      // routes: {
+      //   '/': (context) => PhoneAuthScreen(),
+      //   '/otp_verification': (context) => OtpVerificationScreen(),
+      // },
       home: Scaffold(
         backgroundColor: Colors.white,
-        body: HomeScreen()
+        body: LoginScreen()
       ),
 
 
