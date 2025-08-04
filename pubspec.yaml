@@ -44,6 +44,8 @@ dependencies:
   firebase_core: ^3.15.2
   intl_phone_field: ^3.2.0
   flutter_secure_storage: ^9.2.4
+  firebase_database: ^11.3.10
+  http: ^1.4.0
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +75,8 @@ flutter:
      - assets/animations/finance.json
      - assets/animations/forgot_password.json
      - assets/animations/login.json
+     - assets/animations/loading.json
+
      - assets/expense.png
      - assets/sp_background.png
   #   - images/a_dot_ham.jpeg

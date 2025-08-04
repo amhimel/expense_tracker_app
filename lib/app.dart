@@ -5,11 +5,11 @@ import 'dart:async';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 var kColorScheme = ColorScheme.fromSeed(
-  seedColor: Color.fromARGB(255, 96, 59, 181),
+  seedColor: const Color.fromARGB(255, 96, 59, 181),
 );
 var kDarkColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
-  seedColor: Color.fromARGB(255, 5, 99, 125),
+  seedColor: const Color.fromARGB(255, 5, 99, 125),
 );
 
 class App extends StatefulWidget {
@@ -29,7 +29,7 @@ class _AppState extends State<App> {
   // Load the splash screen for some duration
   void loadSplash() async {
     print("passing..");
-    await Future.delayed(Duration(seconds: 3));
+    await Future.delayed(const Duration(seconds: 3));
     print("splashing..");
     FlutterNativeSplash.remove();
   }
@@ -43,7 +43,7 @@ class _AppState extends State<App> {
         colorScheme: kDarkColorScheme,
         cardTheme: CardTheme.of(context).copyWith(
           color: kDarkColorScheme.secondaryContainer,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -55,13 +55,13 @@ class _AppState extends State<App> {
       //this is our light mode theme
       theme: ThemeData().copyWith(
         colorScheme: kColorScheme,
-        appBarTheme: AppBarTheme().copyWith(
+        appBarTheme: const AppBarTheme().copyWith(
           backgroundColor: kColorScheme.onPrimaryContainer,
           foregroundColor: kColorScheme.primaryContainer,
         ),
         cardTheme: CardTheme.of(context).copyWith(
           color: kDarkColorScheme.secondaryContainer,
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -79,7 +79,7 @@ class _AppState extends State<App> {
       ),
       themeMode: ThemeMode.system,
    
-      home: Scaffold(
+      home: const Scaffold(
         backgroundColor: Colors.white,
         body: AuthCheckScreen()
       ),
