@@ -9,7 +9,7 @@ var kColorScheme = ColorScheme.fromSeed(
 );
 var kDarkColorScheme = ColorScheme.fromSeed(
   brightness: Brightness.dark,
-  seedColor: const Color.fromARGB(255, 5, 99, 125),
+  seedColor: const Color.fromARGB(255, 120, 91, 205),
 );
 
 class App extends StatefulWidget {
@@ -42,7 +42,7 @@ class _AppState extends State<App> {
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
         cardTheme: CardTheme.of(context).copyWith(
-          color: kDarkColorScheme.secondaryContainer,
+          color: kDarkColorScheme.onPrimary,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
@@ -60,7 +60,7 @@ class _AppState extends State<App> {
           foregroundColor: kColorScheme.primaryContainer,
         ),
         cardTheme: CardTheme.of(context).copyWith(
-          color: kDarkColorScheme.secondaryContainer,
+          color: kDarkColorScheme.onPrimaryContainer,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         ),
 

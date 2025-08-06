@@ -76,6 +76,7 @@ flutter:
      - assets/animations/forgot_password.json
      - assets/animations/login.json
      - assets/animations/loading.json
+     - assets/animations/add_expenses.json
 
      - assets/expense.png
      - assets/sp_background.png

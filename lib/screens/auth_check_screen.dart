@@ -1,5 +1,6 @@
 import 'package:expense_tracker/screens/home.dart';
 import 'package:expense_tracker/screens/login_screen.dart';
+import 'package:expense_tracker/screens/tabs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,7 +28,7 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
 
     if (firebaseUser != null && storedUid != null && firebaseUser.uid == storedUid) {
       // ✅ User is logged in and verified
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const HomeScreen()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const TabsScreen()));
     } else {
       // ⛔ Not logged in or secure storage empty
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginScreen()));

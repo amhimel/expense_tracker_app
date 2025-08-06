@@ -1,3 +1,4 @@
+import 'package:expense_tracker/model/expense_model.dart';
 import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,7 +14,33 @@ class FirebaseServices {
     return _auth.currentUser;
   }
 
-  //add user
+  Future<void> addExpense(String category, double amount) async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid != null) {
+      final String currentMonth = DateFormat('MMMMyyyy').format(DateTime.now()); // e.g. August2025
+      final String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now()); // e.g. 06-08-2025
+      final DatabaseReference ref = FirebaseDatabase.instance.ref();
+
+      final expenseRef = ref.child("Expense").child(uid).child(currentMonth).child(currentDate).push();
+      await expenseRef.set({
+        'category': category,
+        'amount': amount,
+      });
+
+      // Subtract from income
+      final incomeRef = ref.child("income").child(uid).child(currentMonth);
+      final snapshot = await incomeRef.get();
+      if (snapshot.exists) {
+        final data = snapshot.value as Map;
+        final currentIncome = (data['income'] as num).toDouble();
+        final updatedIncome = currentIncome - amount;
+        await incomeRef.update({'income': updatedIncome});
+      }
+    }
+  }
+
+
+  //add income
   Future<void> addIncome(IncomeModel incomeModel) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {

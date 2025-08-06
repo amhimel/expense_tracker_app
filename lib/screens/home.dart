@@ -1,7 +1,6 @@
 import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
 import 'package:expense_tracker/services/firebase_services.dart';
-import 'package:expense_tracker/widgets/add_income_dialog_widget.dart';
 import 'package:expense_tracker/widgets/balance_card_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -30,19 +29,11 @@ class _HomeScreenState extends State<HomeScreen> {
       await Future.delayed(const Duration(milliseconds: 500)); // wait for Auth to complete
       await checkUserInfo();
     });
-    greeting = getGreeting();
-
   }
 
-  void addUser() {}
 
-  String getGreeting() {
-    final hour = DateTime.now().hour;
-    if (hour < 12) return "Good Morning";
-    if (hour < 17) return "Good Afternoon";
-    if (hour < 20) return "Good Evening";
-    return "Good Night";
-  }
+
+
 
   Future<void> checkUserInfo() async {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
@@ -146,61 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(120),
-        child: AppBar(
-          backgroundColor: const Color.fromARGB(255, 28, 11, 66),
-          elevation: 0,
-          flexibleSpace: SafeArea(
-            child: StreamBuilder<UserModel?>(
-              stream: _firebaseServices.getUser(),
-              builder: (context, snapshot) {
-                final user = snapshot.data;
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
-                  child: Align(
-                    alignment: Alignment.bottomLeft,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${getGreeting()},",
-                              style: const TextStyle(fontSize: 20, color: Colors.white70),
-                            ),
-                            Text(
-                              user?.name ?? "User",
-                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
-                            ),
-                          ],
-                        ),
-                        InkWell(
-                          onTap: (){
-                            print("add button pressed.");
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white24,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(Icons.notifications, color: Colors.white),
-                          ),
-                        ),
 
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      ),
       body: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
