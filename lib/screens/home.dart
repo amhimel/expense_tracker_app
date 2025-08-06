@@ -1,5 +1,8 @@
+import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
 import 'package:expense_tracker/services/firebase_services.dart';
+import 'package:expense_tracker/widgets/add_income_dialog_widget.dart';
+import 'package:expense_tracker/widgets/balance_card_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +18,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
   final dbRef = FirebaseDatabase.instance.ref();
-  final FirebaseServices firebaseServices = FirebaseServices();
+  final FirebaseServices _firebaseServices = FirebaseServices();
   String userName = '';
   String greeting = '';
 
@@ -59,6 +62,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _handleAddIncome(double income) async {
+    await _firebaseServices.addIncome(IncomeModel(income: income));
+    setState(() {}); // Refresh UI if needed
+  }
 
 
   void showUserInfoDialog() {
@@ -119,9 +126,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         id: uid,
                         name: name,
                         email: email,
+                        phone: phone,
                         createdAt: DateTime.now().toIso8601String(),
                       );
-                      await firebaseServices.addUser(user);
+                      await _firebaseServices.addUser(user);
                       Navigator.pop(context);
                     }
                   },
@@ -141,28 +149,49 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(120),
         child: AppBar(
+          backgroundColor: const Color.fromARGB(255, 28, 11, 66),
           elevation: 0,
           flexibleSpace: SafeArea(
             child: StreamBuilder<UserModel?>(
-              stream: firebaseServices.getUser(),
+              stream: _firebaseServices.getUser(),
               builder: (context, snapshot) {
                 final user = snapshot.data;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 20),
                   child: Align(
                     alignment: Alignment.bottomLeft,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          "${getGreeting()},",
-                          style: const TextStyle(fontSize: 20, color: Colors.white70),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${getGreeting()},",
+                              style: const TextStyle(fontSize: 20, color: Colors.white70),
+                            ),
+                            Text(
+                              user?.name ?? "User",
+                              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ],
                         ),
-                        Text(
-                          user?.name ?? "User",
-                          style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+                        InkWell(
+                          onTap: (){
+                            print("add button pressed.");
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: Colors.white24,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Icon(Icons.notifications, color: Colors.white),
+                          ),
                         ),
+
                       ],
                     ),
                   ),
@@ -172,7 +201,19 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Center(child: Text("Welcome to Expense Tracker")),
+      body: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            BalanceCardWidget(
+              totalBalance: 18000,
+              income: 15000,
+              expenses: 13500,
+              onIncomeAdded: _handleAddIncome,
+            ),
+
+          ],
+        ),
+
     );
   }
 }
