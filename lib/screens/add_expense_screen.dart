@@ -79,7 +79,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
                   labelText: "Enter Expense Amount",
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 15 ),
               ElevatedButton(
                 onPressed: _isLoading ? null : _saveExpense,
                 child: _isLoading

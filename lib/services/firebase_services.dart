@@ -14,18 +14,120 @@ class FirebaseServices {
     return _auth.currentUser;
   }
 
+  //get total income
+  Future<double> getTotalIncome() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw Exception("User not logged in");
+    }
+    final String currentMonth = DateFormat(
+      'MMMMyyyy',
+    ).format(DateTime.now()); // e.g., August2025
+
+    final snapshot = await dbIncomeRef
+        .child(uid)
+        .child(currentMonth)
+        .child('totalIncome')
+        .get();
+
+    if (snapshot.exists) {
+      final value = snapshot.value;
+      if (value is num) {
+        return value.toDouble();
+      } else if (value is String) {
+        return double.tryParse(value) ?? 0.0;
+      } else {
+        return 0.0;
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  /// Get income for currently added
+  Future<double> getCurrentlyInputedIncome() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw Exception("User not logged in");
+    }
+    final String currentMonth = DateFormat(
+      'MMMMyyyy',
+    ).format(DateTime.now()); // e.g., August2025
+
+    final snapshot = await dbIncomeRef
+        .child(uid)
+        .child(currentMonth)
+        .child('income')
+        .get();
+
+    if (snapshot.exists) {
+      final value = snapshot.value;
+      if (value is num) {
+        return value.toDouble();
+      } else if (value is String) {
+        return double.tryParse(value) ?? 0.0;
+      } else {
+        return 0.0;
+      }
+    } else {
+      return 0.0;
+    }
+  }
+
+  //get monthly total expense
+  Future<double> getMonthlyExpense() async {
+    final uid = FirebaseAuth.instance.currentUser?.uid;
+    if (uid == null) {
+      throw Exception("User not logged in");
+    }
+    final currentMonth = DateFormat('MMMMyyyy').format(DateTime.now());
+    final expenseRef = FirebaseDatabase.instance
+        .ref()
+        .child('Expense')
+        .child(uid)
+        .child(currentMonth);
+    final snapshot = await expenseRef.once();
+    double totalExpense = 0.0;
+    if (snapshot.snapshot.value != null) {
+      final daysMap = Map<String, dynamic>.from(snapshot.snapshot.value as Map);
+
+      for (var dayEntry in daysMap.entries) {
+        final expensesInDay = Map<String, dynamic>.from(dayEntry.value);
+
+        for (var expenseEntry in expensesInDay.entries) {
+          final expenseData = Map<String, dynamic>.from(
+            expenseEntry.value as Map,
+          );
+          final amount = expenseData['amount'];
+          if (amount != null) {
+            totalExpense += double.tryParse(amount.toString()) ?? 0.0;
+          }
+        }
+      }
+    }
+
+    return totalExpense;
+  }
+
+  //add expense
   Future<void> addExpense(String category, double amount) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
     if (uid != null) {
-      final String currentMonth = DateFormat('MMMMyyyy').format(DateTime.now()); // e.g. August2025
-      final String currentDate = DateFormat('dd-MM-yyyy').format(DateTime.now()); // e.g. 06-08-2025
+      final String currentMonth = DateFormat(
+        'MMMMyyyy',
+      ).format(DateTime.now()); // e.g. August2025
+      final String currentDate = DateFormat(
+        'dd-MM-yyyy',
+      ).format(DateTime.now()); // e.g. 06-08-2025
       final DatabaseReference ref = FirebaseDatabase.instance.ref();
 
-      final expenseRef = ref.child("Expense").child(uid).child(currentMonth).child(currentDate).push();
-      await expenseRef.set({
-        'category': category,
-        'amount': amount,
-      });
+      final expenseRef = ref
+          .child("Expense")
+          .child(uid)
+          .child(currentMonth)
+          .child(currentDate)
+          .push();
+      await expenseRef.set({'category': category, 'amount': amount});
 
       // Subtract from income
       final incomeRef = ref.child("income").child(uid).child(currentMonth);
@@ -39,7 +141,6 @@ class FirebaseServices {
     }
   }
 
-
   //add income
   Future<void> addIncome(IncomeModel incomeModel) async {
     final uid = FirebaseAuth.instance.currentUser?.uid;
@@ -48,15 +149,18 @@ class FirebaseServices {
       final incomeRef = dbIncomeRef.child(uid).child(currentMonth);
 
       final snapshot = await incomeRef.get();
-      double previousIncome = 0;
+      double previousTotalIncome = 0;
       if (snapshot.exists) {
         final data = Map<String, dynamic>.from(snapshot.value as Map);
-        previousIncome = (data['income'] as num).toDouble();
+        previousTotalIncome = (data['totalIncome'] as num).toDouble();
       }
 
-      final totalIncome = previousIncome + incomeModel.income;
+      final totalIncome = previousTotalIncome + incomeModel.income;
 
-      await incomeRef.set({'income': totalIncome});
+      await incomeRef.set({
+        'income': incomeModel.income,
+        'totalIncome': totalIncome,
+      });
     }
   }
 

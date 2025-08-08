@@ -20,19 +20,38 @@ class _HomeScreenState extends State<HomeScreen> {
   final FirebaseServices _firebaseServices = FirebaseServices();
   String userName = '';
   String greeting = '';
+  double _income = 0.0;
+  double _expenses = 0.0;
+  double _totalIncome = 0.0;
 
   @override
   void initState() {
     super.initState();
     // Add post frame callback to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 500)); // wait for Auth to complete
+      await Future.delayed(const Duration(milliseconds: 200)); // wait for Auth to complete
       await checkUserInfo();
+      await _loadData();
     });
   }
 
 
-
+//load monthly expense and income
+  Future<void> _loadData() async {
+    try {
+      final income = await _firebaseServices.getCurrentlyInputedIncome();
+      final totalIncome = await _firebaseServices.getTotalIncome();
+      final expenses = await _firebaseServices.getMonthlyExpense();
+      print("Income: $income");
+      setState(() {
+        _income = income;
+        _expenses = expenses;
+        _totalIncome = totalIncome;
+      });
+    } catch (e) {
+      print("Error fetching income: $e");
+    }
+  }
 
 
   Future<void> checkUserInfo() async {
@@ -142,9 +161,9 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             BalanceCardWidget(
-              totalBalance: 18000,
-              income: 15000,
-              expenses: 13500,
+              totalBalance: _totalIncome,
+              income: _income,
+              expenses: _expenses,
               onIncomeAdded: _handleAddIncome,
             ),
 

@@ -53,7 +53,7 @@ class BalanceCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '\$ $totalBalance',
+                      'TK $totalBalance',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -109,9 +109,9 @@ class BalanceCardWidget extends StatelessWidget {
                     ],
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.arrow_downward, color: Colors.green),
                           SizedBox(width: 8),
@@ -124,10 +124,10 @@ class BalanceCardWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        '\$1,840.00',
-                        style: TextStyle(
+                        'TK $income',
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
@@ -153,9 +153,9 @@ class BalanceCardWidget extends StatelessWidget {
                     ],
                   ),
                   padding: const EdgeInsets.all(16),
-                  child: const Column(
+                  child: Column(
                     children: [
-                      Row(
+                      const Row(
                         children: [
                           Icon(Icons.arrow_upward, color: Colors.red),
                           SizedBox(width: 8),
@@ -168,10 +168,10 @@ class BalanceCardWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      SizedBox(height: 8),
+                      const SizedBox(height: 8),
                       Text(
-                        '\$284.00',
-                        style: TextStyle(
+                        'TK $expenses',
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
