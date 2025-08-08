@@ -1,9 +1,7 @@
-import 'package:expense_tracker/model/income.dart';
-import 'package:expense_tracker/services/firebase_services.dart';
 import 'package:expense_tracker/widgets/add_income_dialog_widget.dart';
 import 'package:flutter/material.dart';
 
-class BalanceCardWidget extends StatelessWidget {
+class BalanceCardWidget extends StatefulWidget {
   const BalanceCardWidget({
     super.key,
     required this.totalBalance,
@@ -17,6 +15,11 @@ class BalanceCardWidget extends StatelessWidget {
   final double expenses;
   final void Function(double) onIncomeAdded;
 
+  @override
+  State<BalanceCardWidget> createState() => _BalanceCardWidgetState();
+}
+
+class _BalanceCardWidgetState extends State<BalanceCardWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -53,7 +56,7 @@ class BalanceCardWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'TK $totalBalance',
+                      'TK ${widget.totalBalance}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -71,7 +74,7 @@ class BalanceCardWidget extends StatelessWidget {
                     );
 
                     if (income != null) {
-                      onIncomeAdded(income); // ✅ Trigger callback with new income
+                      widget.onIncomeAdded(income); // ✅ Trigger callback with new income
                     }
                   },
                   child: Container(
@@ -126,7 +129,7 @@ class BalanceCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'TK $income',
+                        'TK ${widget.income}',
                         style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,
@@ -170,7 +173,7 @@ class BalanceCardWidget extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'TK $expenses',
+                        'TK ${widget.expenses}',
                         style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,

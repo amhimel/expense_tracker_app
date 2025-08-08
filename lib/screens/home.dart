@@ -29,31 +29,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Add post frame callback to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 200)); // wait for Auth to complete
+      await Future.delayed(
+        const Duration(milliseconds: 50),
+      ); // wait for Auth to complete
       await checkUserInfo();
-      await _loadData();
     });
   }
-
-
-//load monthly expense and income
-  Future<void> _loadData() async {
-    try {
-      final income = await _firebaseServices.getCurrentlyInputedIncome();
-      final totalIncome = await _firebaseServices.getTotalIncome();
-      final expenses = await _firebaseServices.getMonthlyExpense();
-      print("Income: $income");
-      setState(() {
-        _income = income;
-        _expenses = expenses;
-        _totalIncome = totalIncome;
-      });
-    } catch (e) {
-      print("Error fetching income: $e");
-    }
+  Future<void> _handleAddIncome(double income) async {
+    await _firebaseServices.addIncome(IncomeModel(income: income));
+    setState(() {}); // Refresh UI if needed
   }
-
-
   Future<void> checkUserInfo() async {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
     print("Current UID: $currentUid");
@@ -72,18 +57,11 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _handleAddIncome(double income) async {
-    await _firebaseServices.addIncome(IncomeModel(income: income));
-    setState(() {}); // Refresh UI if needed
-  }
-
-
   void showUserInfoDialog() {
     final nameController = TextEditingController();
     final phoneController = TextEditingController();
     final email = FirebaseAuth.instance.currentUser?.email ?? '';
     bool isLoading = false;
-
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -127,22 +105,24 @@ class _HomeScreenState extends State<HomeScreen> {
                   onPressed: isLoading
                       ? null
                       : () async {
-                    final name = nameController.text.trim();
-                    final phone = phoneController.text.trim();
+                          final name = nameController.text.trim();
+                          final phone = phoneController.text.trim();
 
-                    if (name.isNotEmpty && phone.isNotEmpty) {
-                      setState(() => isLoading = true); // ✅ Use dialog's setState here
-                      final user = UserModel(
-                        id: uid,
-                        name: name,
-                        email: email,
-                        phone: phone,
-                        createdAt: DateTime.now().toIso8601String(),
-                      );
-                      await _firebaseServices.addUser(user);
-                      Navigator.pop(context);
-                    }
-                  },
+                          if (name.isNotEmpty && phone.isNotEmpty) {
+                            setState(
+                              () => isLoading = true,
+                            ); // ✅ Use dialog's setState here
+                            final user = UserModel(
+                              id: uid,
+                              name: name,
+                              email: email,
+                              phone: phone,
+                              createdAt: DateTime.now().toIso8601String(),
+                            );
+                            await _firebaseServices.addUser(user);
+                            Navigator.pop(context);
+                          }
+                        },
                   child: const Text("Save"),
                 ),
               ],
@@ -156,20 +136,35 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
-      body: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            BalanceCardWidget(
-              totalBalance: _totalIncome,
-              income: _income,
-              expenses: _expenses,
-              onIncomeAdded: _handleAddIncome,
-            ),
-
-          ],
-        ),
-
+      body: StreamBuilder<double>(
+        stream: _firebaseServices.getCurrentlyInputIncome(),
+        builder: (context, incomeSnapshot) {
+          return StreamBuilder<double>(
+            stream: _firebaseServices.getTotalIncome(),
+            builder: (context, totalIncomeSnapshot) {
+              return StreamBuilder<double>(
+                stream: _firebaseServices.getMonthlyExpense,
+                builder: (context, expenseSnapshot) {
+                  if (!incomeSnapshot.hasData ||
+                      !totalIncomeSnapshot.hasData ||
+                      !expenseSnapshot.hasData) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  final income = incomeSnapshot.data!;
+                  final expenses = expenseSnapshot.data!;
+                  final totalBalance = totalIncomeSnapshot.data!;
+                  return BalanceCardWidget(
+                      totalBalance: totalBalance,
+                      income: income,
+                      expenses: expenses,
+                      onIncomeAdded: _handleAddIncome
+                  );
+                },
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }
