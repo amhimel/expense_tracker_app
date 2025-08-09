@@ -56,7 +56,7 @@ class _BalanceCardWidgetState extends State<BalanceCardWidget> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'TK ${widget.totalBalance}',
+                      '৳ ${widget.totalBalance}',
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 28,
@@ -129,7 +129,7 @@ class _BalanceCardWidgetState extends State<BalanceCardWidget> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'TK ${widget.income}',
+                        '৳ ${widget.income}',
                         style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,
@@ -173,7 +173,7 @@ class _BalanceCardWidgetState extends State<BalanceCardWidget> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'TK ${widget.expenses}',
+                        '৳ ${widget.expenses}',
                         style: const TextStyle(
                           color: Colors.black87,
                           fontSize: 20,

@@ -29,13 +29,13 @@ class _TabsScreenState extends State<TabsScreen> {
       _selectedPageIndex = index;
     });
   }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     greeting = getGreeting();
   }
-
 
   String getGreeting() {
     final hour = DateTime.now().hour;
@@ -59,7 +59,6 @@ class _TabsScreenState extends State<TabsScreen> {
   Widget build(BuildContext context) {
     Widget activePage = const HomeScreen();
     //var activePageTitle = '';
-
     if (_selectedPageIndex == 1) {
       activePage = AddExpenseWidget(onExpenseAdded: onExpenseAdded);
     } else if (_selectedPageIndex == 2) {
@@ -110,7 +109,7 @@ class _TabsScreenState extends State<TabsScreen> {
                         ),
                         InkWell(
                           onTap: () {
-                            print("add button pressed.");
+                            print("notification button pressed.");
                           },
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -135,13 +134,22 @@ class _TabsScreenState extends State<TabsScreen> {
       ),
       body: activePage,
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: const Color.fromARGB(255, 28, 11, 66),
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white30,
         currentIndex: _selectedPageIndex,
         onTap: _selectPage,
         items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          const BottomNavigationBarItem(icon: Icon(Icons.add), label: "Add"),
           const BottomNavigationBarItem(
-            icon: Icon(Icons.bar_chart),
+            icon: Icon(Icons.home_rounded, color: Colors.white, size: 30),
+            label: "Home",
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.add, color: Colors.white, size: 30),
+            label: "Add",
+          ),
+          const BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart, color: Colors.white, size: 30),
             label: "Chart",
           ),
         ],

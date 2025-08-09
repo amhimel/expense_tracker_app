@@ -41,10 +41,10 @@ class _AppState extends State<App> {
       //this is our dark mode theme
       darkTheme: ThemeData.dark().copyWith(
         colorScheme: kDarkColorScheme,
-        cardTheme: CardTheme.of(context).copyWith(
-          color: kDarkColorScheme.onPrimary,
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        ),
+        // cardTheme: CardTheme.of(context).copyWith(
+        //   color: kDarkColorScheme.onPrimary,
+        //   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        // ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
             backgroundColor: kDarkColorScheme.primaryContainer,
@@ -59,10 +59,11 @@ class _AppState extends State<App> {
           backgroundColor: kColorScheme.onPrimaryContainer,
           foregroundColor: kColorScheme.primaryContainer,
         ),
-        cardTheme: CardTheme.of(context).copyWith(
-          color: kDarkColorScheme.onPrimaryContainer,
-          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        ),
+        // cardTheme: CardTheme.of(context).copyWith(
+        //   color: kColorScheme.primaryContainer,
+        //   margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        //   elevation: 2.0
+        // ),
 
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(

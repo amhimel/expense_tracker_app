@@ -1,3 +1,4 @@
+import 'package:expense_tracker/model/expense_model.dart';
 import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
 import 'package:expense_tracker/services/firebase_services.dart';
@@ -29,16 +30,16 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     // Add post frame callback to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(
-        const Duration(milliseconds: 50),
-      ); // wait for Auth to complete
+      await Future.delayed(const Duration(milliseconds: 50)); // wait for Auth to complete
       await checkUserInfo();
     });
   }
+
   Future<void> _handleAddIncome(double income) async {
     await _firebaseServices.addIncome(IncomeModel(income: income));
     setState(() {}); // Refresh UI if needed
   }
+
   Future<void> checkUserInfo() async {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
     print("Current UID: $currentUid");
@@ -93,9 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextField(
                     controller: phoneController,
-                    decoration: const InputDecoration(
-                      labelText: "Phone Number",
-                    ),
+                    decoration: const InputDecoration(labelText: "Phone Number"),
                     keyboardType: TextInputType.phone,
                   ),
                 ],
@@ -109,9 +108,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           final phone = phoneController.text.trim();
 
                           if (name.isNotEmpty && phone.isNotEmpty) {
-                            setState(
-                              () => isLoading = true,
-                            ); // ✅ Use dialog's setState here
+                            setState(() => isLoading = true); // ✅ Use dialog's setState here
                             final user = UserModel(
                               id: uid,
                               name: name,
@@ -136,34 +133,89 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<double>(
-        stream: _firebaseServices.getCurrentlyInputIncome(),
-        builder: (context, incomeSnapshot) {
-          return StreamBuilder<double>(
-            stream: _firebaseServices.getTotalIncome(),
-            builder: (context, totalIncomeSnapshot) {
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          StreamBuilder<double>(
+            stream: _firebaseServices.getCurrentlyInputIncome(),
+            builder: (context, incomeSnapshot) {
               return StreamBuilder<double>(
-                stream: _firebaseServices.getMonthlyExpense,
-                builder: (context, expenseSnapshot) {
-                  if (!incomeSnapshot.hasData ||
-                      !totalIncomeSnapshot.hasData ||
-                      !expenseSnapshot.hasData) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final income = incomeSnapshot.data!;
-                  final expenses = expenseSnapshot.data!;
-                  final totalBalance = totalIncomeSnapshot.data!;
-                  return BalanceCardWidget(
-                      totalBalance: totalBalance,
-                      income: income,
-                      expenses: expenses,
-                      onIncomeAdded: _handleAddIncome
+                stream: _firebaseServices.getTotalIncome(),
+                builder: (context, totalIncomeSnapshot) {
+                  return StreamBuilder<double>(
+                    stream: _firebaseServices.getMonthlyExpense,
+                    builder: (context, expenseSnapshot) {
+                      if (!incomeSnapshot.hasData ||
+                          !totalIncomeSnapshot.hasData ||
+                          !expenseSnapshot.hasData) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      final income = incomeSnapshot.data!;
+                      final expenses = expenseSnapshot.data!;
+                      final totalBalance = totalIncomeSnapshot.data!;
+                      return BalanceCardWidget(
+                        totalBalance: totalBalance,
+                        income: income,
+                        expenses: expenses,
+                        onIncomeAdded: _handleAddIncome,
+                      );
+                    },
                   );
                 },
               );
             },
-          );
-        },
+          ),
+          Expanded(
+            child: StreamBuilder<Map<String, List<ExpenseModel>>>(
+              stream: _firebaseServices.getExpensesGroupedByDate(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text("No expenses found."));
+                }
+
+                final data = snapshot.data!;
+                final sortedDates = data.keys.toList()
+                  ..sort((a, b) => b.compareTo(a)); // Latest date first
+
+                return ListView.builder(
+                  itemCount: sortedDates.length,
+                  itemBuilder: (context, index) {
+                    final date = sortedDates[index];
+                    final expenses = data[date]!;
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      child: Card(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.symmetric(vertical: 8),
+                        elevation: 2,
+                        child: Theme(
+                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          child: ExpansionTile(
+                            leading: const Icon(Icons.date_range_rounded),
+                            title: Text(date),
+                            children: expenses.map((expense) {
+                              return ListTile(
+                                leading: const Icon(Icons.money_rounded),
+                                title: Text("Category: ${expense.category}"),
+                                trailing: Text("৳ ${expense.amount}"),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
       ),
     );
   }

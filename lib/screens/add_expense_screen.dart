@@ -33,7 +33,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
       setState(() => _isLoading = true);
 
       final expenseModel = ExpenseModel(
-        expense: amount,
+        amount: amount,
         category: _selectedCategory,
       );
 
