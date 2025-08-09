@@ -33,7 +33,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
       setState(() => _isLoading = true);
 
       final expenseModel = ExpenseModel(
-        amount: amount,
+        expense: amount,
         category: _selectedCategory,
       );
 
@@ -48,6 +48,7 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
 
       _amountController.clear();
     }
+    Navigator.pop(context);
   }
 
   @override

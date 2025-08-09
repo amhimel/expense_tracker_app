@@ -2,7 +2,7 @@ class ExpenseModel {
 
   factory ExpenseModel.fromMap(Map<String, dynamic> map) {
     return ExpenseModel(
-      amount: (map['amount'] is int)
+      expense: (map['amount'] is int)
           ? (map['amount'] as int).toDouble()
           : (map['amount'] is double)
           ? map['amount']
@@ -12,15 +12,15 @@ class ExpenseModel {
   }
 
   ExpenseModel({
-    required this.amount,
+    required this.expense,
     required this.category,
   });
-  double amount;
+  double expense;
   String category;
 
   Map<String, dynamic> toMap() {
     return {
-      'amount': amount,
+      'amount': expense,
       'category': category,
     };
   }

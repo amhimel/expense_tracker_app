@@ -1,6 +1,7 @@
 import 'package:expense_tracker/model/expense_model.dart';
 import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
+import 'package:expense_tracker/screens/monthly_expense_chart.dart';
 import 'package:expense_tracker/services/firebase_services.dart';
 import 'package:expense_tracker/widgets/balance_card_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,20 +18,20 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final uid = FirebaseAuth.instance.currentUser?.uid;
+  final uidForChart = FirebaseAuth.instance.currentUser?.uid.toString();
   final dbRef = FirebaseDatabase.instance.ref();
   final FirebaseServices _firebaseServices = FirebaseServices();
   String userName = '';
   String greeting = '';
-  double _income = 0.0;
-  double _expenses = 0.0;
-  double _totalIncome = 0.0;
 
   @override
   void initState() {
     super.initState();
     // Add post frame callback to ensure context is ready
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(milliseconds: 50)); // wait for Auth to complete
+      await Future.delayed(
+        const Duration(milliseconds: 50),
+      ); // wait for Auth to complete
       await checkUserInfo();
     });
   }
@@ -94,7 +95,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextField(
                     controller: phoneController,
-                    decoration: const InputDecoration(labelText: "Phone Number"),
+                    decoration: const InputDecoration(
+                      labelText: "Phone Number",
+                    ),
                     keyboardType: TextInputType.phone,
                   ),
                 ],
@@ -108,7 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
                           final phone = phoneController.text.trim();
 
                           if (name.isNotEmpty && phone.isNotEmpty) {
-                            setState(() => isLoading = true); // ✅ Use dialog's setState here
+                            setState(
+                              () => isLoading = true,
+                            ); // ✅ Use dialog's setState here
                             final user = UserModel(
                               id: uid,
                               name: name,
@@ -134,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           StreamBuilder<double>(
@@ -146,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return StreamBuilder<double>(
                     stream: _firebaseServices.getMonthlyExpense,
                     builder: (context, expenseSnapshot) {
-                      if (!incomeSnapshot.hasData ||
+                      if (!incomeSnapshot.hasData||
                           !totalIncomeSnapshot.hasData ||
                           !expenseSnapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
@@ -166,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: StreamBuilder<Map<String, List<ExpenseModel>>>(
               stream: _firebaseServices.getExpensesGroupedByDate(),
@@ -195,7 +201,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         margin: const EdgeInsets.symmetric(vertical: 8),
                         elevation: 2,
                         child: Theme(
-                          data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                          data: Theme.of(
+                            context,
+                          ).copyWith(dividerColor: Colors.transparent),
                           child: ExpansionTile(
                             leading: const Icon(Icons.date_range_rounded),
                             title: Text(date),
@@ -203,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               return ListTile(
                                 leading: const Icon(Icons.money_rounded),
                                 title: Text("Category: ${expense.category}"),
-                                trailing: Text("৳ ${expense.amount}"),
+                                trailing: Text("৳ ${expense.expense}"),
                               );
                             }).toList(),
                           ),
