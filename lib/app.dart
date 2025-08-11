@@ -18,6 +18,7 @@ class App extends StatefulWidget {
   @override
   State<App> createState() => _AppState();
 }
+//final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 class _AppState extends State<App> {
   @override
@@ -37,6 +38,7 @@ class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      //navigatorKey: navigatorKey, // Attach here
       debugShowCheckedModeBanner: false,
       //this is our dark mode theme
       darkTheme: ThemeData.dark().copyWith(

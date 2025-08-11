@@ -1,3 +1,4 @@
+import 'package:expense_tracker/main.dart';
 import 'package:expense_tracker/model/expense_model.dart';
 import 'package:expense_tracker/model/user.dart';
 import 'package:expense_tracker/screens/add_expense_screen.dart';
@@ -7,6 +8,8 @@ import 'package:expense_tracker/services/firebase_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class TabsScreen extends StatefulWidget {
   const TabsScreen({super.key});
@@ -21,8 +24,69 @@ class _TabsScreenState extends State<TabsScreen> {
   final FirebaseServices _firebaseServices = FirebaseServices();
   String userName = '';
   String greeting = '';
-
   int _selectedPageIndex = 0;
+  bool _isNotificationArrive = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Add post frame callback to ensure context is ready
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _requestNotificationPermission();
+      await Future.delayed(
+        const Duration(milliseconds: 50),
+      ); // wait for Auth to complete
+      greeting = getGreeting();
+      _firebaseServices.getTotalIncome().listen((income) {
+        debugPrint("DEBUG: Income Stream Value => $income");
+        if (income < 5000) {
+          debugPrint("DEBUG: Triggering Low Income Notification");
+          _showIncomeLowNotification();
+          setState(() {
+            _isNotificationArrive = true;
+          });
+        }else{
+          setState(() {
+            _isNotificationArrive = false;
+          });
+
+        }
+      });
+    });
+  }
+
+  Future<void> _showIncomeLowNotification() async {
+    const AndroidNotificationDetails androidPlatformChannelSpecifics =
+    AndroidNotificationDetails(
+      'total_balance_alert_channel', // ID
+      'Total Balance Alerts', // Name
+      channelDescription: 'Notifies when total balance is too low',
+      importance: Importance.max,
+      priority: Priority.high,
+      ticker: 'ticker',
+    );
+
+    const NotificationDetails platformChannelSpecifics = NotificationDetails(
+      android: androidPlatformChannelSpecifics,
+    );
+
+    await flutterLocalNotificationsPlugin.show(
+      0, // Notification ID
+      'Low Total Balance Alert',
+      'Your total balance is below 5000. Please add more balance by clicking plus icon in total balance section.',
+      platformChannelSpecifics,
+    );
+  }
+
+  Future<void> _requestNotificationPermission() async {
+    final status = await Permission.notification.request();
+    if (status.isGranted) {
+      debugPrint('Notification permission granted.');
+    } else {
+      debugPrint('Notification permission denied.');
+      // Permission denied, handle accordingly
+    }
+  }
 
   void _selectPage(int index) {
     setState(() {
@@ -30,12 +94,6 @@ class _TabsScreenState extends State<TabsScreen> {
     });
   }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    greeting = getGreeting();
-  }
 
   String getGreeting() {
     final hour = DateTime.now().hour;
@@ -117,8 +175,11 @@ class _TabsScreenState extends State<TabsScreen> {
                               color: Colors.white24,
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(
-                              Icons.notifications,
+                            child: _isNotificationArrive ? const Icon(
+                              Icons.notifications_active,
+                              color: Colors.white,
+                            ) : const Icon(
+                              Icons.notifications_none,
                               color: Colors.white,
                             ),
                           ),

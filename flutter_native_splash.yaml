@@ -1,17 +1,16 @@
 flutter_native_splash:
-  color: "#42a5f5"
+  color: "#1c0b42"
   # platform.
   android: true
   ios: true
   web: false
-  #background_image: "assets/sp_background.png"
   image: "assets/expense.png"
 
   #image_dark: assets/android12splash-invert.png
   #color_dark: "#042a49"
 
   android_12:
-    color: "#ffffff"
+    color: "#1c0b42"
     image: "assets/expense.png"
 
 

@@ -43,12 +43,18 @@ class _AddExpenseWidgetState extends State<AddExpenseWidget> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Expense added successfully')),
       );
-
       widget.onExpenseAdded?.call(expenseModel);
 
       _amountController.clear();
+      // if (mounted) {
+      //   Navigator.pop(context);
+      // }
+    }else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a valid amount')),
+      );
     }
-    Navigator.pop(context);
+
   }
 
   @override

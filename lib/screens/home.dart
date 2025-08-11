@@ -1,8 +1,8 @@
 import 'package:expense_tracker/model/expense_model.dart';
 import 'package:expense_tracker/model/income.dart';
 import 'package:expense_tracker/model/user.dart';
-import 'package:expense_tracker/screens/monthly_expense_chart.dart';
 import 'package:expense_tracker/services/firebase_services.dart';
+import 'package:expense_tracker/widgets/UserInfoDialog.dart';
 import 'package:expense_tracker/widgets/balance_card_widget.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -43,97 +43,106 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> checkUserInfo() async {
     final currentUid = FirebaseAuth.instance.currentUser?.uid;
-    print("Current UID: $currentUid");
+    debugPrint("Current UID: $currentUid");
 
     if (currentUid == null) {
-      print("UID is null. Skipping check.");
+      debugPrint("UID is null. Skipping check.");
       return;
     }
 
     final snapshot = await dbRef.child("users/$currentUid").get();
     if (!snapshot.exists) {
-      print("User info not found. Showing dialog...");
-      showUserInfoDialog();
+      debugPrint("User info not found. Showing dialog...");
+      //showUserInfoDialog()
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => UserInfoDialog(
+          uid: uid!,
+          firebaseServices: _firebaseServices,
+        ),
+      );
+
     } else {
-      print("User info already exists.");
+      debugPrint("User info already exists.");
     }
   }
 
-  void showUserInfoDialog() {
-    final nameController = TextEditingController();
-    final phoneController = TextEditingController();
-    final email = FirebaseAuth.instance.currentUser?.email ?? '';
-    bool isLoading = false;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) {
-        return StatefulBuilder(
-          // 🔥 For updating isLoading within dialog
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text("Complete Your Profile"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (isLoading) ...[
-                    const SizedBox(height: 20),
-                    SizedBox(
-                      height: 100,
-                      width: 100,
-                      child: Lottie.asset(
-                        'assets/animations/loading.json',
-                        height: 100,
-                        width: 100,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ],
-                  TextField(
-                    controller: nameController,
-                    decoration: const InputDecoration(labelText: "Name"),
-                  ),
-                  TextField(
-                    controller: phoneController,
-                    decoration: const InputDecoration(
-                      labelText: "Phone Number",
-                    ),
-                    keyboardType: TextInputType.phone,
-                  ),
-                ],
-              ),
-              actions: [
-                ElevatedButton(
-                  onPressed: isLoading
-                      ? null
-                      : () async {
-                          final name = nameController.text.trim();
-                          final phone = phoneController.text.trim();
-
-                          if (name.isNotEmpty && phone.isNotEmpty) {
-                            setState(
-                              () => isLoading = true,
-                            ); // ✅ Use dialog's setState here
-                            final user = UserModel(
-                              id: uid,
-                              name: name,
-                              email: email,
-                              phone: phone,
-                              createdAt: DateTime.now().toIso8601String(),
-                            );
-                            await _firebaseServices.addUser(user);
-                            Navigator.pop(context);
-                          }
-                        },
-                  child: const Text("Save"),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
+  // void showUserInfoDialog() {
+  //   final nameController = TextEditingController();
+  //   final phoneController = TextEditingController();
+  //   final email = FirebaseAuth.instance.currentUser?.email ?? '';
+  //   bool isLoading = false;
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (context) {
+  //       return StatefulBuilder(
+  //         // 🔥 For updating isLoading within dialog
+  //         builder: (context, setState) {
+  //           return AlertDialog(
+  //             title: const Text("Complete Your Profile"),
+  //             content: Column(
+  //               mainAxisSize: MainAxisSize.min,
+  //               children: [
+  //                 if (isLoading) ...[
+  //                   const SizedBox(height: 20),
+  //                   SizedBox(
+  //                     height: 100,
+  //                     width: 100,
+  //                     child: Lottie.asset(
+  //                       'assets/animations/loading.json',
+  //                       height: 100,
+  //                       width: 100,
+  //                       fit: BoxFit.contain,
+  //                     ),
+  //                   ),
+  //                 ],
+  //                 TextField(
+  //                   controller: nameController,
+  //                   decoration: const InputDecoration(labelText: "Name"),
+  //                 ),
+  //                 TextField(
+  //                   controller: phoneController,
+  //                   decoration: const InputDecoration(
+  //                     labelText: "Phone Number",
+  //                   ),
+  //                   keyboardType: TextInputType.phone,
+  //                 ),
+  //               ],
+  //             ),
+  //             actions: [
+  //               ElevatedButton(
+  //                 onPressed: isLoading
+  //                     ? null
+  //                     : () async {
+  //                         final name = nameController.text.trim();
+  //                         final phone = phoneController.text.trim();
+  //
+  //                         if (name.isNotEmpty && phone.isNotEmpty) {
+  //                           setState(
+  //                             () => isLoading = true,
+  //                           ); // ✅ Use dialog's setState here
+  //                           final user = UserModel(
+  //                             id: uid,
+  //                             name: name,
+  //                             email: email,
+  //                             phone: phone,
+  //                             createdAt: DateTime.now().toIso8601String(),
+  //                           );
+  //                           await _firebaseServices.addUser(user);
+  //                           Navigator.pop(context);
+  //                         }
+  //                       },
+  //                 child: const Text("Save"),
+  //               ),
+  //             ],
+  //           );
+  //         },
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -151,7 +160,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   return StreamBuilder<double>(
                     stream: _firebaseServices.getMonthlyExpense,
                     builder: (context, expenseSnapshot) {
-                      if (!incomeSnapshot.hasData||
+                      if (!incomeSnapshot.hasData ||
                           !totalIncomeSnapshot.hasData ||
                           !expenseSnapshot.hasData) {
                         return const Center(child: CircularProgressIndicator());
