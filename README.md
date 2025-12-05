@@ -88,13 +88,6 @@ Smooth user navigation
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- Flutter **3.x** and Dart **3.x**
-- A Supabase project (obtain **SUPABASE_URL** and **SUPABASE_ANON_KEY**)
-- A TMDB API key (get it from https://www.themoviedb.org/settings/api)
-- A Stripe account (for test **STRIPE_PUBLISHABLE_KEY**)
-
-
 ### Setup
 
 ```bash
